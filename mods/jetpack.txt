@@ -1,3 +1,4 @@
+// this code was written for portal 1. put this in "steam/steamapps/common/portal/portal/mapadd/main.txt"
 "mapadd" {
 	"precache" {
 		"model" "models/props_c17/canister02a.mdl"
