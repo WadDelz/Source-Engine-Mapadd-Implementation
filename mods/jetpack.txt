@@ -1,0 +1,127 @@
+"mapadd" {
+	"precache" {
+		"model" "models/props_c17/canister02a.mdl"
+	}	
+	"entities" {
+		"logic_label" {
+			"targetname" "label_main"
+		}
+		"logic_label" {
+			"targetname" "labem_not00"
+			"keyvalues" {
+				"wait" "0.5"
+				"label" "main"
+			}
+		}
+	}
+	"entities:init" {
+		"bind" {
+			"space" "+jump"
+		}
+	}
+	"entities:main" {
+		"entity_velocity_checker" {
+			"targetname" "vel_check"
+			"keyvalues" {
+				"entity" "player"
+				"VelocityZ" "220"
+				"OnVelocityMoreThan" "label_main,execute,slow,0,-1"
+				"enabled" "0"
+			}
+		}
+		"entity_velocity_checker" {
+			"targetname" "vel_check_less_than_zero"
+			"keyvalues" {
+				"entity" "player"
+				"VelocityZ" "1"
+				"OnVelocityLessThan" "label_main,execute,jump_up,0,-1"
+				"enabled" "0"
+			}
+		}
+		"alias" {
+			"+jetpack" "mapadd_execute_label start"
+			"-jetpack" "mapadd_execute_label stop"
+		}
+		"bind" {
+			"space" "+jetpack"
+		}
+	}
+	"entities:hud" {
+		"hud" {
+			"message" "Jetpack Unlocked.."
+		}
+	}
+	"entities:start" {
+		"console" {
+			"command" "sv_gravity 0"
+		}
+		"player" {
+			"velocity" "0 0 150"
+		}
+		"label_loop" {
+			"targetname" "loop"
+			"keyvalues" {
+				"delay" "0.1"
+				"label" "boost"
+				"enabled" "1"
+			}
+		}
+		"ent_fire" {
+			"vel_check" "enable"
+			"vel_check_less_than_zero" "enable"
+		}
+	}
+	"entities:boost" {
+		"player" {
+			"velocity" "0 0 40"
+		}
+	}
+	"entities:slow" {
+		"player" {
+			"velocity_z" "220"
+		}
+	}
+	"entities:slow" {
+		"player" {
+			"velocity_z" "150"
+		}
+	}
+	"entities:stop" {
+		"removeentity" {
+			"targetname" "loop"
+		}
+		"ent_fire" {
+			"vel_check" "disable"
+			"vel_check_less_than_zero" "disable"
+		}
+		"console" {
+			"command" "sv_gravity 600"
+		}
+	}
+	"testchmb_a_00" {
+		"instant_trigger" {
+			"origin" "-736 -252 610"
+			"keyvalues" {
+				"radius" "40"
+				"label" "main"
+				"autodisable" "1"
+				"ontrigger" "model_jetpack,kill,,0,-1"
+				"ontrigger" "label_main,execute,hud,0,-1"
+			}
+		}
+		"prop_dynamic_override" {
+			"origin" "-736 -252 620"
+			"targetname" "model_jetpack"
+			"keyvalues" {
+				"model" "models/props_c17/canister02a.mdl"
+				"renderfx" "15"
+			}
+		}
+		"logic_auto" {
+			"keyvalues" {
+				"onmapspawn" "label_main,execute,init,0,-1"
+				"onmapspawn" "labem_not00,kill,,0,-1"
+			}
+		}
+	}
+}

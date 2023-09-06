@@ -1,0 +1,87 @@
+"mapadd" {
+	"entities" {
+		"logic_label" {
+			"keyvalues" {
+				"label" "MGunMain"	
+			}
+		}
+	}
+	"entities:MGunMain" {
+		"alias" {
+			"+shoot1" "mapadd_execute_label MGunEB" 
+			"-shoot1" "mapadd_execute_label MGunDB"
+			"+shoot2" "mapadd_execute_label MGunEO" 
+			"-shoot2" "mapadd_execute_label MGunDO"
+		}
+		"bind" {
+			"mouse1" "+shoot1"
+			"mouse2" "//"
+		}
+	}
+	"entities:MGunEB" {
+		"label_loop" {
+			"targetname" "loop_fire_blue" 
+			"keyvalues" {
+				"delay" "0.05"
+				"label" "MGunFireLoopBlue"
+				"enabled" "1"
+			}
+		}
+	}
+	"entities:MGunDB" {
+		"removeentity" {
+			"targetname" "loop_fire_blue"
+		}
+	}
+	"entities:MGunEO" {
+		"label_loop" {
+			"targetname" "loop_fire_orange" 
+			"keyvalues" {
+				"delay" "0.05"
+				"label" "MGunFireLoopOrange"
+				"enabled" "1"
+			}
+		}
+	}
+	"entities:MGunDO" {
+		"removeentity" {
+			"targetname" "loop_fire_orange"
+		}
+	}
+	"entities:MGunFireLoopBlue" {
+		"player" {
+			"viewpunch" "0.01 0.01 0.01"
+		}
+		"console" {
+			"command" "ent_fire weapon_portalgun fireportal1"
+		}
+	}
+	"entities:MGunFireLoopOrange" {
+		"player" {
+			"viewpunch" "0.01 0.01 0.01"
+		}
+		"console" {
+			"command" "ent_fire weapon_portalgun fireportal2"
+		}
+	}
+	"testchmb_a_07" {
+		"logic_label" {
+			"targetname" "LabelMGBind"
+			"keyvalues" {
+				"label" "MGMap07"
+			}
+		}
+	}
+	"entities:MGMap07" {
+		"ent_fire" {
+			"addoutput" {
+				"floor_portalgun_rm6" "onplayerpickup LabelMGBind,execute,MGBind,0,-1"
+			}
+		}
+	}
+	"entities:MGBind" {
+		"bind" {
+			"mouse2" "+shoot2"
+		}
+	}
+}
