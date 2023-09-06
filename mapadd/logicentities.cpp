@@ -3,6 +3,7 @@
 // Purpose: Implements many of the entities that control logic flow within a map.
 //
 //=============================================================================
+// Edit from waddelz i didnt mean to add this file into the source code and idk how to delete so yea
 
 #include "cbase.h"
 #include "entityinput.h"
