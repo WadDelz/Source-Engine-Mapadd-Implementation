@@ -1,5 +1,4 @@
 #include "cbase.h"
-#include "portal_player.h"
 
 CON_COMMAND(fov_zoom, "Zooms The Players Fov\n")
 {
