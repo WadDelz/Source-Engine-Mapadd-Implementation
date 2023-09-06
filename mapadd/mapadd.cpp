@@ -812,36 +812,6 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 					UTIL_Remove(ent);
 			}
 		}
-		if (!Q_strcmp(classname->GetName(), "modifyentity"))
-		{
-			FOR_EACH_VALUE(classname, value)
-			{
-				CBaseEntity *pEnt = nullptr;
-				if (!Q_strcmp(value->GetName(), "ByName"))
-				{
-					pEnt = gEntList.FindEntityByName(NULL, value->GetString());
-				}
-				else if (!Q_strcmp(value->GetName(), "ByModel"))
-				{
-					pEnt = gEntList.FindEntityByModel(NULL, value->GetString());
-				}
-				else if (!Q_strcmp(value->GetName(), "ByOrigin"))
-				{
-					Vector vec;
-					UTIL_StringToVector(vec.Base(), value->GetString());
-
-					pEnt = FindEntityByOrigin(Vector(vec.x, vec.y, vec.z));
-				}
-				else if (!Q_strcmp(value->GetName(), "ByHammerID"))
-				{
-					pEnt = FindEntityByHammerId(value->GetInt());
-				}
-				else
-				{
-					pEnt->KeyValue(value->GetName(), value->GetString());
-				}
-			}
-		}
 		else if (!Q_strcmp(classname->GetName(), "player"))
 		{
 			FOR_EACH_VALUE(classname, value)
