@@ -18,9 +18,9 @@ private:
 	//functions
 	bool m_bEnabled;
 	string_t m_sEntity;
-	int m_vecX;
-	int m_vecY;
-	int m_vecZ;
+	float m_vecX;
+	float m_vecY;
+	float m_vecZ;
 	COutputEvent OnOriginMatch;
 	COutputEvent OnOriginLessThan;
 	COutputEvent OnOriginMoreThan;
@@ -31,9 +31,9 @@ LINK_ENTITY_TO_CLASS(entity_origin_checker, CEntityOriginChecker);
 BEGIN_DATADESC(CEntityOriginChecker)
 DEFINE_KEYFIELD(m_bEnabled, FIELD_BOOLEAN, "enabled"),
 DEFINE_KEYFIELD(m_sEntity, FIELD_STRING, "entity"),
-DEFINE_KEYFIELD(m_vecX, FIELD_INTEGER, "OriginX"),
-DEFINE_KEYFIELD(m_vecY, FIELD_INTEGER, "OriginY"),
-DEFINE_KEYFIELD(m_vecZ, FIELD_INTEGER, "OriginZ"),
+DEFINE_KEYFIELD(m_vecX, FIELD_FLOAT, "OriginX"),
+DEFINE_KEYFIELD(m_vecY, FIELD_FLOAT, "OriginY"),
+DEFINE_KEYFIELD(m_vecZ, FIELD_FLOAT, "OriginZ"),
 DEFINE_OUTPUT(OnOriginMatch, "OnOriginMatch"),
 DEFINE_OUTPUT(OnOriginLessThan, "OnOriginLessThan"),
 DEFINE_OUTPUT(OnOriginMoreThan, "OnOriginMoreThan"),
@@ -141,9 +141,9 @@ private:
 	//functions
 	bool m_bEnabled;
 	string_t m_sEntity;
-	int m_vecX;
-	int m_vecY;
-	int m_vecZ;
+	float m_vecX;
+	float m_vecY;
+	float m_vecZ;
 	COutputEvent OnVelocityMatch;
 	COutputEvent OnVelocityLessThan;
 	COutputEvent OnVelocityMoreThan;
@@ -154,9 +154,9 @@ LINK_ENTITY_TO_CLASS(entity_velocity_checker, CEntityVelocityChecker);
 BEGIN_DATADESC(CEntityVelocityChecker)
 DEFINE_KEYFIELD(m_bEnabled, FIELD_BOOLEAN, "enabled"),
 DEFINE_KEYFIELD(m_sEntity, FIELD_STRING, "entity"),
-DEFINE_KEYFIELD(m_vecX, FIELD_INTEGER, "VelocityX"),
-DEFINE_KEYFIELD(m_vecY, FIELD_INTEGER, "VelocityY"),
-DEFINE_KEYFIELD(m_vecZ, FIELD_INTEGER, "VelocityZ"),
+DEFINE_KEYFIELD(m_vecX, FIELD_FLOAT, "VelocityX"),
+DEFINE_KEYFIELD(m_vecY, FIELD_FLOAT, "VelocityY"),
+DEFINE_KEYFIELD(m_vecZ, FIELD_FLOAT, "VelocityZ"),
 DEFINE_OUTPUT(OnVelocityMatch, "OnVelocityMatch"),
 DEFINE_OUTPUT(OnVelocityLessThan, "OnVelocityLessThan"),
 DEFINE_OUTPUT(OnVelocityMoreThan, "OnVelocityMoreThan"),
