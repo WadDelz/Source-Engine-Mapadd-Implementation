@@ -1,3 +1,4 @@
+//this is verrrrrrrryyyyyyy broken(i think it barely works) because i rushed this like i was running for my life. idk why i just didnt have the time
 "mapadd" {
 	"entities" {
 		"logic_label" {
