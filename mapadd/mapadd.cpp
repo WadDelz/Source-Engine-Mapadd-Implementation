@@ -723,6 +723,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 								else if (!Q_strcmp(value->GetString(), boolNames[j]))
 								{
 									boolValues[i] = boolValues[j];
+									break;
 								}
 							}
 						}
