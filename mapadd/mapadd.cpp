@@ -816,22 +816,22 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 			FOR_EACH_VALUE(classname, value)
 			{
 				CBaseEntity *pEnt = nullptr;
-				if (!Q_strcmp(value->GetName, "ByName"))
+				if (!Q_strcmp(value->GetName(), "ByName"))
 				{
 					pEnt = gEntList.FindEntityByName(NULL, value->GetString());
 				}
-				else if (!Q_strcmp(value->GetName, "ByModel"))
+				else if (!Q_strcmp(value->GetName(), "ByModel"))
 				{
 					pEnt = gEntList.FindEntityByModel(NULL, value->GetString());
 				}
-				else if (!Q_strcmp(value->GetName, "ByOrigin"))
+				else if (!Q_strcmp(value->GetName(), "ByOrigin"))
 				{
 					Vector vec;
 					UTIL_StringToVector(vec.Base(), value->GetString());
 
 					pEnt = FindEntityByOrigin(Vector(vec.x, vec.y, vec.z));
 				}
-				else if (!Q_strcmp(value->GetName, "ByHammerID"))
+				else if (!Q_strcmp(value->GetName(), "ByHammerID"))
 				{
 					pEnt = FindEntityByHammerId(value->GetInt());
 				}
