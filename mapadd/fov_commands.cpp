@@ -3,7 +3,7 @@
 
 CON_COMMAND(fov_zoom, "Zooms The Players Fov\n")
 {
-	CPortal_Player* pPlayer = dynamic_cast<CPortal_Player*>(UTIL_GetLocalPlayer());
+	CBasePlayer* pPlayer = UTIL_GetLocalPlayer();
 	if (!pPlayer)
 		return;
 
