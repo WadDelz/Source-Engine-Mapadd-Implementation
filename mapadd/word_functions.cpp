@@ -151,6 +151,34 @@ bool IsNumber(const char* str) {
 	return hasDigit || hasSign;
 }
 
+bool IsInt(const char* str) {
+	if (str == nullptr || *str == '\0') {
+		// Handle empty string or null pointer
+		return false;
+	}
+
+	bool hasDigit = false;
+	bool hasSign = false;
+
+	for (const char* p = str; *p != '\0'; ++p) {
+		if (!isdigit(*p)) {
+			// Check for allowed characters '<', '>', '=', and '!'
+			if (*p != '<' && *p != '>' && *p != '=' && *p != '!') {
+				return false; // Invalid character
+			}
+		}
+		else {
+			hasDigit = true;
+		}
+		if ((p == str && (*p == '+' || *p == '-')) || (p != str && (*p == '+' || *p == '-'))) {
+			hasSign = true;
+		}
+	}
+
+	// Ensure there's at least one digit in the string
+	return hasDigit || hasSign;
+}
+
 bool IsBool(const char* str) {
 	if (str == nullptr || *str == '\0') {
 		return false;
@@ -162,4 +190,24 @@ bool IsBool(const char* str) {
 	}
 
 	return false;
+}
+
+int binaryToInt(int binaryInt) {
+	int result = 0;
+	int base = 1;
+
+	while (binaryInt > 0) {
+		int lastDigit = binaryInt % 10;
+
+		if (lastDigit != 0 && lastDigit != 1) {
+			// Handle invalid input
+			return -1; // You can choose an appropriate error code here
+		}
+
+		result += lastDigit * base;
+		base *= 2;
+		binaryInt /= 10;
+	}
+
+	return result;
 }
