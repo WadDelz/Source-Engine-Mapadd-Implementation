@@ -5,6 +5,7 @@
 
 ConVar mapadd_disableload("mapadd_disableload", "0");
 ConVar mapadd_secondary_script("mapadd_secondary_script", "mapadd/mods/NULL.txt");
+ConVar mapadd_debug("mapadd_debug", "0");
 
 CMapaddSystem::CMapaddSystem(const char* name) : CAutoGameSystem(name)
 {
@@ -42,7 +43,7 @@ void CMapaddSystem::ParseMapaddFile(const char* name)
 
 	if (!mapaddFile->LoadFromFile(filesystem, name, "MOD"))
 		return;
-		
+
 	KeyValues* Precache = mapaddFile->FindKey("precache");
 	KeyValues* Entities = mapaddFile->FindKey("entities");
 	KeyValues* map = mapaddFile->FindKey(gpGlobals->mapname.ToCStr());
@@ -76,6 +77,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 {
 	FOR_EACH_SUBKEY(keyvalues, classname)
 	{
+		MapaddDevMsg("Subkey Found: %s\n", classname->GetName());
 		if (!Q_strcmp(classname->GetName(), "int"))
 		{
 			FOR_EACH_VALUE(classname, value)
@@ -91,6 +93,11 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 					{
 						intNames.addElement(value->GetName());
 						intValues.addElement(Q_atoi(value->GetString()));
+					}
+					else if (StartsWith(value->GetString(), "b"))
+					{
+						intNames.addElement(value->GetName());
+						intValues.addElement(binaryToInt(Q_atoi(removeNonIntCharacters(value->GetString()).c_str())));
 					}
 					else
 					{
@@ -393,8 +400,15 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 				}
 				else
 				{
-					floatNames.addElement(value->GetName());
-					floatValues.addElement(Q_atof(value->GetString()));
+					if (IsNumber(value->GetString()))
+					{
+						floatNames.addElement(value->GetName());
+						floatValues.addElement(Q_atof(value->GetString()));
+					}
+					else
+					{
+						ConMsg("Error: float %s Value Is Not float\n", value->GetName());
+					}
 				}
 			}
 			KeyValues* change = classname->FindKey("change_value");
@@ -784,6 +798,336 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 				}
 			}
 		}
+		else if (!Q_strcmp(classname->GetName(), "convar"))
+		{
+			FOR_EACH_VALUE(classname, value)
+			{
+				ConVar *var = cvar->FindVar(value->GetName());
+				if (!var)
+				{
+					var = new ConVar(value->GetName(), value->GetString());
+				}
+			}
+			KeyValues *Ifcvar = classname->FindKey("if");
+			if (Ifcvar)
+			{
+				FOR_EACH_VALUE(Ifcvar, value)
+				{
+					ConVar *var = cvar->FindVar(getFirstWord(value->GetName()).c_str());
+					if (var)
+					{
+						if (StartsWith(getSecondWord(value->GetName()).c_str(), "<"))
+						{
+							if (IsInt(getSecondWord(value->GetName()).c_str()))
+							{
+								if (var->GetInt() < Q_atoi(removeNonIntCharacters(getSecondWord(value->GetName()).c_str()).c_str()))
+								{
+									PARSELABEL
+								}
+							}
+							else if (IsNumber(getSecondWord(value->GetName()).c_str()))
+							{
+								if (var->GetFloat() < Q_atof(removeNonFloatCharacters(getSecondWord(value->GetName()).c_str()).c_str()))
+								{
+									PARSELABEL
+								}
+							}
+							else
+							{
+								bool IsFloat = true;
+								for (int i = 0; i < intNames.getSize(); i++)
+								{
+									if (!Q_strcmp(removeFunctionCharacters(getSecondWord(value->GetName()).c_str()).c_str(), intNames[i]))
+									{
+										if (var->GetInt() < intValues[i])
+										{
+											PARSELABEL
+												IsFloat = false;
+										}
+									}
+								}
+								if (IsFloat)
+								{
+									for (int i = 0; i < floatNames.getSize(); i++)
+									{
+										if (!Q_strcmp(removeFunctionCharacters(getSecondWord(value->GetName()).c_str()).c_str(), floatNames[i]))
+										{
+											if (var->GetFloat() < floatValues[i])
+											{
+												PARSELABEL
+											}
+										}
+									}
+								}
+							}
+						}
+						else if (StartsWith(getSecondWord(value->GetName()).c_str(), "<="))
+						{
+							if (IsInt(getSecondWord(value->GetName()).c_str()))
+							{
+								if (var->GetInt() <= Q_atoi(removeNonIntCharacters(getSecondWord(value->GetName()).c_str()).c_str()))
+								{
+									PARSELABEL
+								}
+							}
+							else if (IsNumber(getSecondWord(value->GetName()).c_str()))
+							{
+								if (var->GetFloat() <= Q_atof(removeNonFloatCharacters(getSecondWord(value->GetName()).c_str()).c_str()))
+								{
+									PARSELABEL
+								}
+							}
+							else
+							{
+								bool IsFloat = true;
+								for (int i = 0; i < intNames.getSize(); i++)
+								{
+									if (!Q_strcmp(removeFunctionCharacters(getSecondWord(value->GetName()).c_str()).c_str(), intNames[i]))
+									{
+										if (var->GetInt() <= intValues[i])
+										{
+											PARSELABEL
+												IsFloat = false;
+										}
+									}
+								}
+								if (IsFloat)
+								{
+									for (int i = 0; i < floatNames.getSize(); i++)
+									{
+										if (!Q_strcmp(removeFunctionCharacters(getSecondWord(value->GetName()).c_str()).c_str(), floatNames[i]))
+										{
+											if (var->GetFloat() <= floatValues[i])
+											{
+												PARSELABEL
+											}
+										}
+									}
+								}
+							}
+						}
+						else if (StartsWith(getSecondWord(value->GetName()).c_str(), ">"))
+						{
+							if (IsInt(getSecondWord(value->GetName()).c_str()))
+							{
+								if (var->GetInt() > Q_atoi(removeNonIntCharacters(getSecondWord(value->GetName()).c_str()).c_str()))
+								{
+									PARSELABEL
+								}
+							}
+							else if (IsNumber(getSecondWord(value->GetName()).c_str()))
+							{
+								if (var->GetFloat() > Q_atof(removeNonFloatCharacters(getSecondWord(value->GetName()).c_str()).c_str()))
+								{
+									PARSELABEL
+								}
+							}
+							else
+							{
+								bool IsFloat = true;
+								for (int i = 0; i < intNames.getSize(); i++)
+								{
+									if (!Q_strcmp(removeFunctionCharacters(getSecondWord(value->GetName()).c_str()).c_str(), intNames[i]))
+									{
+										if (var->GetInt() > intValues[i])
+										{
+											PARSELABEL
+												IsFloat = false;
+										}
+									}
+								}
+								if (IsFloat)
+								{
+									for (int i = 0; i < floatNames.getSize(); i++)
+									{
+										if (!Q_strcmp(removeFunctionCharacters(getSecondWord(value->GetName()).c_str()).c_str(), floatNames[i]))
+										{
+											if (var->GetFloat() > floatValues[i])
+											{
+												PARSELABEL
+											}
+										}
+									}
+								}
+							}
+						}
+						else if (StartsWith(getSecondWord(value->GetName()).c_str(), ">="))
+						{
+							if (IsInt(getSecondWord(value->GetName()).c_str()))
+							{
+								if (var->GetInt() >= Q_atoi(removeNonIntCharacters(getSecondWord(value->GetName()).c_str()).c_str()))
+								{
+									PARSELABEL
+								}
+							}
+							else if (IsNumber(getSecondWord(value->GetName()).c_str()))
+							{
+								if (var->GetFloat() >= Q_atof(removeNonFloatCharacters(getSecondWord(value->GetName()).c_str()).c_str()))
+								{
+									PARSELABEL
+								}
+							}
+							else
+							{
+								bool IsFloat = true;
+								for (int i = 0; i < intNames.getSize(); i++)
+								{
+									if (!Q_strcmp(removeFunctionCharacters(getSecondWord(value->GetName()).c_str()).c_str(), intNames[i]))
+									{
+										if (var->GetInt() >= intValues[i])
+										{
+											PARSELABEL
+												IsFloat = false;
+										}
+									}
+								}
+								if (IsFloat)
+								{
+									for (int i = 0; i < floatNames.getSize(); i++)
+									{
+										if (!Q_strcmp(removeFunctionCharacters(getSecondWord(value->GetName()).c_str()).c_str(), floatNames[i]))
+										{
+											if (var->GetFloat() >= floatValues[i])
+											{
+												PARSELABEL
+											}
+										}
+									}
+								}
+							}
+						}
+						else if (StartsWith(getSecondWord(value->GetName()).c_str(), "=="))
+						{
+							if (IsInt(getSecondWord(value->GetName()).c_str()))
+							{
+								if (var->GetInt() == Q_atoi(removeNonIntCharacters(getSecondWord(value->GetName()).c_str()).c_str()))
+								{
+									PARSELABEL
+								}
+							}
+							else if (IsNumber(getSecondWord(value->GetName()).c_str()))
+							{
+								if (var->GetFloat() == Q_atof(removeNonFloatCharacters(getSecondWord(value->GetName()).c_str()).c_str()))
+								{
+									PARSELABEL
+								}
+							}
+							else
+							{
+								bool IsFloat = true;
+								for (int i = 0; i < intNames.getSize(); i++)
+								{
+									if (!Q_strcmp(removeFunctionCharacters(getSecondWord(value->GetName()).c_str()).c_str(), intNames[i]))
+									{
+										if (var->GetInt() == intValues[i])
+										{
+											PARSELABEL
+												IsFloat = false;
+										}
+									}
+								}
+								if (IsFloat)
+								{
+									for (int i = 0; i < floatNames.getSize(); i++)
+									{
+										if (!Q_strcmp(removeFunctionCharacters(getSecondWord(value->GetName()).c_str()).c_str(), floatNames[i]))
+										{
+											if (var->GetFloat() == floatValues[i])
+											{
+												PARSELABEL
+											}
+										}
+									}
+								}
+							}
+						}
+						else if (StartsWith(getSecondWord(value->GetName()).c_str(), "!="))
+						{
+							if (IsInt(getSecondWord(value->GetName()).c_str()))
+							{
+								if (var->GetInt() != Q_atoi(removeNonIntCharacters(getSecondWord(value->GetName()).c_str()).c_str()))
+								{
+									PARSELABEL
+								}
+							}
+							else if (IsNumber(getSecondWord(value->GetName()).c_str()))
+							{
+								if (var->GetFloat() != Q_atof(removeNonFloatCharacters(getSecondWord(value->GetName()).c_str()).c_str()))
+								{
+									PARSELABEL
+								}
+							}
+							else
+							{
+								bool IsFloat = true;
+								for (int i = 0; i < intNames.getSize(); i++)
+								{
+									if (!Q_strcmp(removeFunctionCharacters(getSecondWord(value->GetName()).c_str()).c_str(), intNames[i]))
+									{
+										if (var->GetInt() != intValues[i])
+										{
+											PARSELABEL
+												IsFloat = false;
+										}
+									}
+								}
+								if (IsFloat)
+								{
+									for (int i = 0; i < floatNames.getSize(); i++)
+									{
+										if (!Q_strcmp(removeFunctionCharacters(getSecondWord(value->GetName()).c_str()).c_str(), floatNames[i]))
+										{
+											if (var->GetFloat() != floatValues[i])
+											{
+												PARSELABEL
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			KeyValues* toInt = classname->FindKey("toint");
+			if (toInt)
+			{
+				FOR_EACH_VALUE(toInt, value)
+				{
+					ConVar *find = cvar->FindVar(value->GetName());
+					if (find)
+					{
+						for (int i = 0; i < intNames.getSize(); i++)
+						{
+							if (!Q_strcmp(value->GetString(), intNames[i]))
+							{
+								intValues[i] = find->GetInt();
+								break;
+							}
+						}
+					}
+				}
+			}
+			KeyValues* tofloat = classname->FindKey("tofloat");
+			if (tofloat)
+			{
+				FOR_EACH_VALUE(tofloat, value)
+				{
+					ConVar *find = cvar->FindVar(value->GetName());
+					if (find)
+					{
+						for (int i = 0; i < floatNames.getSize(); i++)
+						{
+							if (!Q_strcmp(value->GetString(), floatNames[i]))
+							{
+								floatValues[i] = find->GetFloat();
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
 		else if (!Q_strcmp(classname->GetName(), "removeentity"))
 		{
 			FOR_EACH_VALUE(classname, value)
@@ -858,7 +1202,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 				else if (!Q_strcmp(value->GetName(), "size"))
 				{
 					DYNAMICINT(engine->ClientCommand(pPlayer->edict(), "ent_fire !player setmodelscale %s", intValChar))
-					else
+				else
 					{
 						engine->ClientCommand(pPlayer->edict(), "ent_fire !player setmodelscale %s", value->GetString());
 					}
@@ -866,7 +1210,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 				else if (!Q_strcmp(value->GetName(), "health"))
 				{
 					DYNAMICINT(engine->ClientCommand(pPlayer->edict(), "ent_fire !player sethealth %s", intValChar))
-					else
+				else
 					{
 						engine->ClientCommand(pPlayer->edict(), "ent_fire !player sethealth %s", value->GetString());
 					}
@@ -874,7 +1218,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 				else if (!Q_strcmp(value->GetName(), "velocity_x"))
 				{
 					DYNAMICINT(pPlayer->SetAbsVelocity(Vector(Q_atof(intValChar), pPlayer->GetAbsVelocity().y, pPlayer->GetAbsVelocity().z)))
-					else
+				else
 					{
 						pPlayer->SetAbsVelocity(Vector(value->GetFloat(), pPlayer->GetAbsVelocity().y, pPlayer->GetAbsVelocity().z));
 					}
@@ -882,7 +1226,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 				else if (!Q_strcmp(value->GetName(), "velocity_y"))
 				{
 					DYNAMICINT(pPlayer->SetAbsVelocity(Vector(pPlayer->GetAbsVelocity().x, Q_atof(intValChar), pPlayer->GetAbsVelocity().z)))
-					else
+				else
 					{
 						pPlayer->SetAbsVelocity(Vector(pPlayer->GetAbsVelocity().x, value->GetFloat(), pPlayer->GetAbsVelocity().z));
 					}
@@ -890,7 +1234,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 				else if (!Q_strcmp(value->GetName(), "velocity_z"))
 				{
 					DYNAMICINT(pPlayer->SetAbsVelocity(Vector(UTIL_GetLocalPlayer()->GetAbsVelocity().x, pPlayer->GetAbsVelocity().y, Q_atof(intValChar))))
-					else
+				else
 					{
 						pPlayer->SetAbsVelocity(Vector(pPlayer->GetAbsVelocity().x, pPlayer->GetAbsVelocity().y, value->GetFloat()));
 					}
@@ -949,7 +1293,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 				if (!Q_strcmp(value->GetName(), "message"))
 				{
 					DYNAMICINT(ClientPrint(UTIL_GetLocalPlayer(), HUD_PRINTCENTER, intValChar))
-					else
+				else
 					{
 						ClientPrint(UTIL_GetLocalPlayer(), HUD_PRINTCENTER, value->GetString());
 					}
@@ -967,7 +1311,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 				else if (!Q_strcmp(value->GetName(), "message"))
 				{
 					DYNAMICINT(ConMsg("%s\n", intValChar))
-					else
+				else
 					{
 						ConMsg("%s\n", value->GetString());
 					}
@@ -975,7 +1319,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 				else if (!Q_strcmp(value->GetName(), "DevMsg"))
 				{
 					DYNAMICINT(DevMsg("%s\n", intValChar))
-					else
+				else
 					{
 						DevMsg("%s\n", value->GetString());
 					}
@@ -987,7 +1331,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 			FOR_EACH_VALUE(classname, value)
 			{
 				DYNAMICINT(engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "%s %s", value->GetName(), intValChar))
-				else
+		else
 				{
 					engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "%s %s", value->GetName(), value->GetString());
 				}
@@ -998,7 +1342,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 			FOR_EACH_VALUE(classname, value)
 			{
 				DYNAMICINT(engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "ent_fire %s %s", value->GetName(), intValChar))
-				engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "ent_fire %s %s", value->GetName(), value->GetString());
+					engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "ent_fire %s %s", value->GetName(), value->GetString());
 			}
 			KeyValues* addoutput = classname->FindKey("addoutput");
 			if (addoutput)
@@ -1050,7 +1394,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 					FOR_EACH_VALUE(kvsec, value)
 					{
 						DYNAMICINT(ent->KeyValue(value->GetName(), intValChar))
-						else
+				else
 						{
 							ent->KeyValue(value->GetName(), value->GetString());
 						}
@@ -1110,4 +1454,13 @@ CBaseEntity *FindEntityByHammerId(int id)
 		pEnt = gEntList.NextEnt(pEnt);
 	}
 	return nullptr;
+}
+
+//i willl add more dev msg's in the future 
+void MapaddDevMsg(const tchar* msg, ...)
+{
+	if (mapadd_debug.GetBool())
+	{
+		ConColorMsg(Color(255, 100, 0, 125), msg);
+	}
 }
