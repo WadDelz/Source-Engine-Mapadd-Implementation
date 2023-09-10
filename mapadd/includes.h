@@ -1,3 +1,5 @@
+#include <string>
+
 #define DYNAMICINT(DoThis) 	\
 int valnam = 99999999; \
 int valnamfloat = 99999999; \
@@ -60,8 +62,11 @@ std::string getSecondWord(const char* input);
 std::string removeNonIntCharacters(const char* input);
 std::string removeNonFloatCharacters(const char* input);
 std::string removeFunctionCharacters(const char* input);
-bool hasTwoWords(const char* str);
-bool IsNumber(const char* str);
 bool IsBool(const char* str);
+bool IsNumber(const char* str);
+bool IsInt(const char* str);
+bool hasTwoWords(const char* str);
+bool hasBrackets(const char* input);
 bool StartsWith(const char* word, const char* find);
+int binaryToInt(int binaryInt);
 //i will add more to this file in the future
