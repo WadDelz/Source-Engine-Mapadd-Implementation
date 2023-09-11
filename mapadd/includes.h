@@ -1,5 +1,13 @@
 #include <string>
 
+//for anyone like themaster974 who sees this. in the future (soon) I will implement a function where
+//if you have a keyvalue with an int float or bool's name as its value i will make it so you can write
+//the name of the bool float or int anywhere in the string and not just the entire string/keyvalue 
+//being the int float or bool's name. so instead of me
+//having the string having to be "val" (just pretend I have an int named val) I could have the string be
+//"the players health is val" or something else where the entire string isn't just the name of the value
+
+
 #define DYNAMICINT(DoThis) 	\
 int valnam = 99999999; \
 int valnamfloat = 99999999; \
