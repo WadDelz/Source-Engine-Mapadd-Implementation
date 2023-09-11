@@ -96,6 +96,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 					}
 					else if (StartsWith(value->GetString(), "b"))
 					{
+						//I got abit bored
 						intNames.addElement(value->GetName());
 						intValues.addElement(binaryToInt(Q_atoi(removeNonIntCharacters(value->GetString()).c_str())));
 					}
