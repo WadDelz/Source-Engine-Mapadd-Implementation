@@ -245,3 +245,5 @@ void CEntityVelocityChecker::InputEnable(inputdata_t& input)
 {
 	m_bEnabled = true;
 }
+
+//entity_health_checker coming soon
