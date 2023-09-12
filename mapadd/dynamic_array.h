@@ -6,6 +6,9 @@
 #include <initializer_list>
 #include <unordered_map>
 
+//I made this dynamic array because I do not know how to use std::vector.
+//like tf is a pull_back push_back or pop. so I just decided to make my own dynamic array
+
 template <typename T>
 class DynamicArray {
 public:
