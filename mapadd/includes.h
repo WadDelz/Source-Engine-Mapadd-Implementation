@@ -6,7 +6,10 @@
 //being the int float or bool's name. so instead of me
 //having the string having to be "val" (just pretend I have an int named val) I could have the string be
 //"the players health is val" or something else where the entire string isn't just the name of the value
-
+//I will also make probably a DynamicArray and store the array indexes of the bools floats and ints so multiple
+//ints floats and bools can be in a keyvalue. I will also add for the actual int and float function I will
+//also add a function that makes it so if you write like "player health" for the ints value then the ints value
+//would be the players health.
 
 #define DYNAMICINT(DoThis) 	\
 int valnam = 99999999; \
