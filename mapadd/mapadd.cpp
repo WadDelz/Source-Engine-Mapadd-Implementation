@@ -101,12 +101,12 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 					}
 					else if (hasTwoWords(value->GetString()) && !IsInt(getFirstWord(value->GetString()).c_str()) && !IsInt(getSecondWord(value->GetString()).c_str()))
 					{
-						intNames.addElement(value->GetName());
 						CBaseEntity* pEnt = gEntList.FindEntityByName(NULL, getFirstWord(value->GetString()).c_str());
 						if (pEnt)
 						{
 							if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "health"))
 							{
+								intNames.addElement(value->GetName())
 								intValues.addElement(pEnt->GetHealth());
 							}
 						}
@@ -477,7 +477,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 										}
 									}
 								}
-							}
+							} 
 							else if (!Q_strcmp(getFirstWord(value->GetString()).c_str(), "*"))
 							{
 								if (IsNumber(getSecondWord(value->GetString()).c_str()))
