@@ -1,6 +1,7 @@
 #include "cbase.h"	
 #include <iostream>
 #include <string>
+#include <cctype>
 #include "includes.h"
 
 std::string getFirstWord(const char* input) {
@@ -208,6 +209,95 @@ int binaryToInt(int binaryInt) {
 		base *= 2;
 		binaryInt /= 10;
 	}
+
+	return result;
+}
+
+bool IsWordBoundary(char c) {
+	return std::isspace(static_cast<unsigned char>(c)) || std::ispunct(static_cast<unsigned char>(c));
+}
+
+bool HasWord(const char* text, const char* word) {
+	if (text == nullptr || word == nullptr) {
+		return false; 
+	}
+
+	int textLength = strlen(text);
+	int wordLength = strlen(word);
+
+	if (wordLength > textLength) {
+		return false;
+	}
+
+	for (int i = 0; i <= textLength - wordLength; ++i) {
+		bool found = true;
+
+		if ((i == 0 || IsWordBoundary(text[i - 1])) &&
+			(i + wordLength == textLength || IsWordBoundary(text[i + wordLength]))) {
+			for (int j = 0; j < wordLength; ++j) {
+				if (tolower(text[i + j]) != tolower(word[j])) {
+					found = false;
+					break; 
+				}
+			}
+		}
+		else {
+			found = false;
+		}
+
+		if (found) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+const char* ReplaceWord(const char* text, const char* wordToReplace, const char* replacementWord) {
+	if (text == nullptr || wordToReplace == nullptr || replacementWord == nullptr) {
+		return text;
+	}
+
+	int textLength = strlen(text);
+	int wordToReplaceLength = strlen(wordToReplace);
+	int replacementWordLength = strlen(replacementWord);
+
+	char* result = new char[textLength + 1];
+	int resultIndex = 0;
+	int i = 0;
+
+	while (i < textLength) {
+		bool found = true;
+
+		if ((i == 0 || IsWordBoundary(text[i - 1])) &&
+			(i + wordToReplaceLength == textLength || IsWordBoundary(text[i + wordToReplaceLength]))) {
+			for (int j = 0; j < wordToReplaceLength; ++j) {
+				if (tolower(text[i + j]) != tolower(wordToReplace[j])) {
+					found = false;
+					break;
+				}
+			}
+		}
+		else {
+			found = false; 
+		}
+
+		if (found) {
+			for (int j = 0; j < replacementWordLength; ++j) {
+				result[resultIndex] = replacementWord[j];
+				resultIndex++;
+			}
+
+			i += wordToReplaceLength;
+		}
+		else {
+			result[resultIndex] = text[i];
+			resultIndex++;
+			i++;
+		}
+	}
+
+	result[resultIndex] = '\0';
 
 	return result;
 }
