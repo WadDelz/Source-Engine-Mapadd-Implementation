@@ -136,7 +136,7 @@ bool IsNumber(const char* str) {
 	for (const char* p = str; *p != '\0'; ++p) {
 		if (!isdigit(*p)) {
 			// Check for allowed characters '<', '>', '=', and '!'
-			if (*p != '<' && *p != '>' && *p != '=' && *p != '!' && *p != '.') {
+			if (*p != '<' && *p != '>' && *p != '=' && *p != '!' && *p != '.' && *p != '+' && *p != '*' && *p != '-' && *p != '/') {
 				return false; // Invalid character
 			}
 		}
@@ -164,7 +164,7 @@ bool IsInt(const char* str) {
 	for (const char* p = str; *p != '\0'; ++p) {
 		if (!isdigit(*p)) {
 			// Check for allowed characters '<', '>', '=', and '!'
-			if (*p != '<' && *p != '>' && *p != '=' && *p != '!') {
+			if (*p != '<' && *p != '>' && *p != '=' && *p != '!' && *p != '+' && *p != '*' && *p != '-' && *p != '/') {
 				return false; // Invalid character
 			}
 		}
