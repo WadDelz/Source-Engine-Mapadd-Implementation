@@ -106,7 +106,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 						{
 							if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "health"))
 							{
-								intNames.addElement(value->GetName())
+								intNames.addElement(value->GetName());
 								intValues.addElement(pEnt->GetHealth());
 							}
 						}
@@ -429,6 +429,28 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 						floatNames.addElement(value->GetName());
 						floatValues.addElement(Q_atof(value->GetString()));
 					}
+					else if (hasTwoWords(value->GetString()) && !IsNumber(getFirstWord(value->GetString()).c_str()) && !IsNumber(getSecondWord(value->GetString()).c_str()))
+					{
+						CBaseEntity* pEnt = gEntList.FindEntityByName(NULL, getFirstWord(value->GetString()).c_str());
+						if (pEnt)
+						{
+							if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_x"))
+							{
+								floatNames.addElement(value->GetName());
+								floatValues.addElement(pEnt->GetAbsOrigin().x);
+							}
+							else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_y"))
+							{
+								floatNames.addElement(value->GetName());
+								floatValues.addElement(pEnt->GetAbsOrigin().y);
+							}
+							else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_z"))
+							{
+								floatNames.addElement(value->GetName());
+								floatValues.addElement(pEnt->GetAbsOrigin().z);
+							}
+						}
+					}
 				}
 			}
 			KeyValues* change = classname->FindKey("change_value");
@@ -477,7 +499,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 										}
 									}
 								}
-							} 
+							}
 							else if (!Q_strcmp(getFirstWord(value->GetString()).c_str(), "*"))
 							{
 								if (IsNumber(getSecondWord(value->GetString()).c_str()))
@@ -513,6 +535,28 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 											floatValues[i] /= floatValues[j];
 											break;
 										}
+									}
+								}
+							}
+							else if (hasTwoWords(value->GetString()) && !IsNumber(getFirstWord(value->GetString()).c_str()) && !IsNumber(getSecondWord(value->GetString()).c_str()))
+							{
+								CBaseEntity* pEnt = gEntList.FindEntityByName(NULL, getFirstWord(value->GetString()).c_str());
+								if (pEnt)
+								{
+									if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_x"))
+									{
+										floatValues[i] = pEnt->GetAbsOrigin().x;
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_y"))
+									{
+										floatValues[i] = pEnt->GetAbsOrigin().y;
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_z"))
+									{
+										floatValues[i] = pEnt->GetAbsOrigin().z;
+										break;
 									}
 								}
 							}
