@@ -61,7 +61,7 @@ if (intNamVal.getSize() != 0 || floatNamVal.getSize() != 0 || boolNamVal.getSize
 	for (int i = 0; i < floatNamVal.getSize(); i++)\
 	{\
 		char add[FILENAME_MAX];\
-		Q_snprintf(add, sizeof(add), "%f", floatValues[floatNamVal[i]]);\
+		Q_snprintf(add, sizeof(add), "%.2f", floatValues[floatNamVal[i]]);\
 		absstr = ReplaceWord(absstr, floatNames[floatNamVal[i]], add);\
 	}\
 	for (int i = 0; i < stringNamVal.getSize(); i++)\
