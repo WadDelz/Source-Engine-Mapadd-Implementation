@@ -214,64 +214,69 @@ int binaryToInt(int binaryInt) {
 }
 
 bool IsWordBoundary(char c) {
-	return std::isspace(static_cast<unsigned char>(c)) || std::ispunct(static_cast<unsigned char>(c));
+	// Define characters that can be word boundaries (e.g., space, punctuation, and comma).
+	return std::isspace(static_cast<unsigned char>(c)) || std::ispunct(static_cast<unsigned char>(c)) || c == ',' || c == '^';
 }
 
 bool HasWord(const char* text, const char* word) {
 	if (text == nullptr || word == nullptr) {
-		return false; 
+		return false; // Handle nullptr inputs gracefully.
 	}
 
 	int textLength = strlen(text);
 	int wordLength = strlen(word);
 
 	if (wordLength > textLength) {
-		return false;
+		return false; // The word is longer than the text, it can't be found.
 	}
 
 	for (int i = 0; i <= textLength - wordLength; ++i) {
 		bool found = true;
 
+		// Check if the word to replace is at the current position.
 		if ((i == 0 || IsWordBoundary(text[i - 1])) &&
 			(i + wordLength == textLength || IsWordBoundary(text[i + wordLength]))) {
 			for (int j = 0; j < wordLength; ++j) {
+				// Compare characters in a case-insensitive manner
 				if (tolower(text[i + j]) != tolower(word[j])) {
 					found = false;
-					break; 
+					break; // Break if a mismatch is found.
 				}
 			}
 		}
 		else {
-			found = false;
+			found = false; // Not a complete word match.
 		}
 
 		if (found) {
-			return true;
+			return true; // The word was found in the text.
 		}
 	}
 
-	return false;
+	return false; // The word was not found in the text.
 }
 
 const char* ReplaceWord(const char* text, const char* wordToReplace, const char* replacementWord) {
 	if (text == nullptr || wordToReplace == nullptr || replacementWord == nullptr) {
-		return text;
+		return text; // Return the original text if inputs are invalid.
 	}
 
 	int textLength = strlen(text);
 	int wordToReplaceLength = strlen(wordToReplace);
 	int replacementWordLength = strlen(replacementWord);
 
-	char* result = new char[textLength + 1];
+	char* result = new char[textLength + 1]; // +1 for the null terminator
 	int resultIndex = 0;
 	int i = 0;
 
 	while (i < textLength) {
 		bool found = true;
 
+		// Check if the word to replace is at the current position.
 		if ((i == 0 || IsWordBoundary(text[i - 1])) &&
 			(i + wordToReplaceLength == textLength || IsWordBoundary(text[i + wordToReplaceLength]))) {
 			for (int j = 0; j < wordToReplaceLength; ++j) {
+				// Compare characters in a case-insensitive manner
 				if (tolower(text[i + j]) != tolower(wordToReplace[j])) {
 					found = false;
 					break;
@@ -279,10 +284,11 @@ const char* ReplaceWord(const char* text, const char* wordToReplace, const char*
 			}
 		}
 		else {
-			found = false; 
+			found = false; // Not a complete word match.
 		}
 
 		if (found) {
+			// Replace the word.
 			for (int j = 0; j < replacementWordLength; ++j) {
 				result[resultIndex] = replacementWord[j];
 				resultIndex++;
@@ -291,13 +297,61 @@ const char* ReplaceWord(const char* text, const char* wordToReplace, const char*
 			i += wordToReplaceLength;
 		}
 		else {
+			// Copy the character as is.
 			result[resultIndex] = text[i];
 			resultIndex++;
 			i++;
 		}
 	}
 
-	result[resultIndex] = '\0';
+	result[resultIndex] = '\0'; // Null-terminate the result.
+
+	return result;
+}
+
+const char* ReplaceWordBrackets(const char* text, const char* wordToReplace, const char* replacementWord) {
+	if (text == nullptr || wordToReplace == nullptr || replacementWord == nullptr) {
+		std::cerr << "Invalid input." << std::endl;
+		return text; // Return the original text if inputs are invalid.
+	}
+
+	int textLength = strlen(text);
+	int wordToReplaceLength = strlen(wordToReplace);
+	int replacementWordLength = strlen(replacementWord);
+
+	char* result = new char[textLength + 1]; // +1 for the null terminator
+	int resultIndex = 0;
+	int i = 0;
+
+	while (i < textLength) {
+		bool found = true;
+
+		// Check if the word to replace is at the current position.
+		for (int j = 0; j < wordToReplaceLength; ++j) {
+			if (text[i + j] != wordToReplace[j]) {
+				found = false;
+				break;
+			}
+		}
+
+		if (found) {
+			// Replace the word.
+			for (int j = 0; j < replacementWordLength; ++j) {
+				result[resultIndex] = replacementWord[j];
+				resultIndex++;
+			}
+
+			i += wordToReplaceLength;
+		}
+		else {
+			// Copy the character as is.
+			result[resultIndex] = text[i];
+			resultIndex++;
+			i++;
+		}
+	}
+
+	result[resultIndex] = '\0'; // Null-terminate the result.
 
 	return result;
 }
