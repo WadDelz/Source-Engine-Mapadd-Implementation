@@ -429,28 +429,6 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 						floatNames.addElement(value->GetName());
 						floatValues.addElement(Q_atof(value->GetString()));
 					}
-					else if (hasTwoWords(value->GetString()) && !IsNumber(getFirstWord(value->GetString()).c_str()) && !IsNumber(getSecondWord(value->GetString()).c_str()))
-					{
-						CBaseEntity* pEnt = gEntList.FindEntityByName(NULL, getFirstWord(value->GetString()).c_str());
-						if (pEnt)
-						{
-							if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_x"))
-							{
-								floatNames.addElement(value->GetName());
-								floatValues.addElement(pEnt->GetAbsOrigin().x);
-							}
-							else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_y"))
-							{
-								floatNames.addElement(value->GetName());
-								floatValues.addElement(pEnt->GetAbsOrigin().y);
-							}
-							else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_z"))
-							{
-								floatNames.addElement(value->GetName());
-								floatValues.addElement(pEnt->GetAbsOrigin().z);
-							}
-						}
-					}
 				}
 			}
 			KeyValues* change = classname->FindKey("change_value");
@@ -535,28 +513,6 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 											floatValues[i] /= floatValues[j];
 											break;
 										}
-									}
-								}
-							}
-							else if (hasTwoWords(value->GetString()) && !IsNumber(getFirstWord(value->GetString()).c_str()) && !IsNumber(getSecondWord(value->GetString()).c_str()))
-							{
-								CBaseEntity* pEnt = gEntList.FindEntityByName(NULL, getFirstWord(value->GetString()).c_str());
-								if (pEnt)
-								{
-									if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_x"))
-									{
-										floatValues[i] = pEnt->GetAbsOrigin().x;
-										break;
-									}
-									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_y"))
-									{
-										floatValues[i] = pEnt->GetAbsOrigin().y;
-										break;
-									}
-									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_z"))
-									{
-										floatValues[i] = pEnt->GetAbsOrigin().z;
-										break;
 									}
 								}
 							}
@@ -859,6 +815,57 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 							{
 								boolNames.deleteElement(i);
 								boolValues.deleteElement(i);
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		else if (!Q_strcmp(classname->GetName(), "string"))
+		{
+			FOR_EACH_VALUE(classname, value)
+			{
+				stringNames.addElement(value->GetName());
+				stringValues.addElement(value->GetString());
+			}
+			KeyValues* change = classname->FindKey("change_value");
+			if (change)
+			{
+				FOR_EACH_VALUE(change, value)
+				{
+					for (int i = 0; i < stringNames.getSize(); i++)
+					{
+						if (!Q_strcmp(value->GetName(), stringNames[i]))
+						{
+							stringValues[i] = value->GetString();
+							break;				
+						}
+					}
+				}
+			}
+			KeyValues* deletevalue = classname->FindKey("delete");
+			if (deletevalue)
+			{
+				FOR_EACH_VALUE(deletevalue, value)
+				{
+					for (int i = 0; i < stringNames.getSize(); i++)
+					{
+						if (!Q_strcmp(value->GetName(), "ByName"))
+						{
+							if (!Q_strcmp(value->GetString(), stringNames[i]))
+							{
+								stringNames.deleteElement(i);
+								stringValues.deleteElement(i);
+								break;
+							}
+						}
+						else if (!Q_strcmp(value->GetName(), "ByValue"))
+						{
+							if (!Q_strcmp(value->GetString(), stringValues[i]))
+							{
+								stringNames.deleteElement(i);
+								stringValues.deleteElement(i);
 								break;
 							}
 						}
@@ -1203,11 +1210,17 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 				CBaseEntity* ent = nullptr;
 				if (!Q_strcmp(value->GetName(), "targetname"))
 				{
-					ent = gEntList.FindEntityByName(NULL, value->GetString());
+					DYNAMICINT(ent = gEntList.FindEntityByName(NULL, absstr))
+					{
+						ent = gEntList.FindEntityByName(NULL, str_nonfunc);
+					}
 				}
 				else if (!Q_strcmp(value->GetName(), "model"))
 				{
-					ent = gEntList.FindEntityByModel(NULL, value->GetString());
+					DYNAMICINT(ent = gEntList.FindEntityByModel(NULL, absstr))
+					{
+						ent = gEntList.FindEntityByModel(NULL, str_nonfunc);
+					}
 				}
 				else if (!Q_strcmp(value->GetName(), "origin"))
 				{
@@ -1237,7 +1250,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 					pPlayer->SetAbsOrigin(Vector(origin.x, origin.y, origin.z)))
 					{
 						Vector origin;
-						UTIL_StringToVector(origin.Base(), value->GetString());
+						UTIL_StringToVector(origin.Base(), str_nonfunc);
 
 						pPlayer->SetAbsOrigin(Vector(origin.x, origin.y, origin.z));
 					}
@@ -1250,7 +1263,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 					pPlayer->VelocityPunch(Vector(velocity.x, velocity.y, velocity.z)))
 					{
 						Vector velocity;
-						UTIL_StringToVector(velocity.Base(), value->GetString());
+						UTIL_StringToVector(velocity.Base(), str_nonfunc);
 
 						pPlayer->VelocityPunch(Vector(velocity.x, velocity.y, velocity.z));
 					}
@@ -1263,7 +1276,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 					pPlayer->SetAbsVelocity(Vector(velocity.x, velocity.y, velocity.z)))
 					{
 						Vector velocity;
-						UTIL_StringToVector(velocity.Base(), value->GetString());
+						UTIL_StringToVector(velocity.Base(), str_nonfunc);
 
 						pPlayer->SetAbsVelocity(Vector(velocity.x, velocity.y, velocity.z));
 					}
@@ -1276,54 +1289,60 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 					pPlayer->ViewPunch(QAngle(punch.x, punch.y, punch.z)))
 					{
 						Vector punch;
-						UTIL_StringToVector(punch.Base(), value->GetString());
+						UTIL_StringToVector(punch.Base(), str_nonfunc);
 
 						pPlayer->ViewPunch(QAngle(punch.x, punch.y, punch.z));
 					}
 				}
 				else if (!Q_strcmp(value->GetName(), "music"))
 				{
-					char play[FILENAME_MAX];
-					Q_snprintf(play, sizeof(play), "playgamesound %s", value->GetString());
-					engine->ClientCommand(pPlayer->edict(), play);
+					DYNAMICINT(char play[FILENAME_MAX];
+					Q_snprintf(play, sizeof(play), "playgamesound %s", absstr);
+					engine->ClientCommand(pPlayer->edict(), play);)
+					{
+						char play[FILENAME_MAX];
+						Q_snprintf(play, sizeof(play), "playgamesound %s", str_nonfunc);
+						engine->ClientCommand(pPlayer->edict(), play);
+					}
 				}
 				else if (!Q_strcmp(value->GetName(), "give"))
 				{
-					pPlayer->GiveNamedItem(value->GetString());
+					DYNAMICINT(pPlayer->GiveNamedItem(absstr))
+					pPlayer->GiveNamedItem(str_nonfunc);
 				}
 				else if (!Q_strcmp(value->GetName(), "size"))
 				{
 					DYNAMICINT(engine->ClientCommand(pPlayer->edict(), "ent_fire !player setmodelscale %s", absstr))
 					{
-						engine->ClientCommand(pPlayer->edict(), "ent_fire !player setmodelscale %s", value->GetString());
+						engine->ClientCommand(pPlayer->edict(), "ent_fire !player setmodelscale %s", str_nonfunc);
 					}
 				}
 				else if (!Q_strcmp(value->GetName(), "health"))
 				{
 					DYNAMICINT(engine->ClientCommand(pPlayer->edict(), "ent_fire !player sethealth %s", absstr))
 					{
-						engine->ClientCommand(pPlayer->edict(), "ent_fire !player sethealth %s", value->GetString());
+						engine->ClientCommand(pPlayer->edict(), "ent_fire !player sethealth %s", str_nonfunc);
 					}
 				}
 				else if (!Q_strcmp(value->GetName(), "velocity_x"))
 				{
 					DYNAMICINT(pPlayer->SetAbsVelocity(Vector(Q_atof(absstr), pPlayer->GetAbsVelocity().y, pPlayer->GetAbsVelocity().z)))
 					{
-						pPlayer->SetAbsVelocity(Vector(value->GetFloat(), pPlayer->GetAbsVelocity().y, pPlayer->GetAbsVelocity().z));
+						pPlayer->SetAbsVelocity(Vector(Q_atof(str_nonfunc), pPlayer->GetAbsVelocity().y, pPlayer->GetAbsVelocity().z));
 					}
 				}
 				else if (!Q_strcmp(value->GetName(), "velocity_y"))
 				{
 					DYNAMICINT(pPlayer->SetAbsVelocity(Vector(pPlayer->GetAbsVelocity().x, Q_atof(absstr), pPlayer->GetAbsVelocity().z)))
 					{
-						pPlayer->SetAbsVelocity(Vector(pPlayer->GetAbsVelocity().x, value->GetFloat(), pPlayer->GetAbsVelocity().z));
+						pPlayer->SetAbsVelocity(Vector(pPlayer->GetAbsVelocity().x, Q_atof(str_nonfunc), pPlayer->GetAbsVelocity().z));
 					}
 				}
 				else if (!Q_strcmp(value->GetName(), "velocity_z"))
 				{
 					DYNAMICINT(pPlayer->SetAbsVelocity(Vector(UTIL_GetLocalPlayer()->GetAbsVelocity().x, pPlayer->GetAbsVelocity().y, Q_atof(absstr))))
 					{
-						pPlayer->SetAbsVelocity(Vector(pPlayer->GetAbsVelocity().x, pPlayer->GetAbsVelocity().y, value->GetFloat()));
+						pPlayer->SetAbsVelocity(Vector(pPlayer->GetAbsVelocity().x, pPlayer->GetAbsVelocity().y, Q_atof(str_nonfunc)));
 					}
 				}
 			}
@@ -1334,7 +1353,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 			{
 				DYNAMICINT(engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "bind %s \"%s\"", value->GetName(), absstr))
 				{
-					engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "bind %s \"%s\"", value->GetName(), value->GetString());
+					engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "bind %s \"%s\"", value->GetName(), str_nonfunc);
 				}
 			}
 		}
@@ -1344,7 +1363,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 			{
 				DYNAMICINT(engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "alias %s \"%s\"", value->GetName(), absstr))
 				{
-					engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "alias %s \"%s\"", value->GetName(), value->GetString());
+					engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "alias %s \"%s\"", value->GetName(), str_nonfunc);
 				}
 			}
 		}
@@ -1359,35 +1378,35 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 					{
 						DYNAMICINT(pEnt->KeyValue("targetname", absstr))
 						{
-							pEnt->KeyValue("targetname", value->GetString());
+							pEnt->KeyValue("targetname", str_nonfunc);
 						}
 					}
 					else if (!Q_strcmp(value->GetName(), "origin"))
 					{
 						DYNAMICINT(pEnt->KeyValue("origin", absstr))
 						{
-							pEnt->KeyValue("origin", value->GetString());
+							pEnt->KeyValue("origin", str_nonfunc);
 						}
 					}
 					else if (!Q_strcmp(value->GetName(), "angles"))
 					{
 						DYNAMICINT(pEnt->KeyValue("angles", absstr))
 						{
-							pEnt->KeyValue("angles", value->GetString());
+							pEnt->KeyValue("angles", str_nonfunc);
 						}
 					}
 					else if (!Q_strcmp(value->GetName(), "mins"))
 					{
 						DYNAMICINT(pEnt->KeyValue("mins", absstr))
 						{
-							pEnt->KeyValue("mins", value->GetString());
+							pEnt->KeyValue("mins", str_nonfunc);
 						}
 					}
 					else if (!Q_strcmp(value->GetName(), "maxs"))
 					{
 						DYNAMICINT(pEnt->KeyValue("maxs", absstr))
 						{
-							pEnt->KeyValue("maxs", value->GetString());
+							pEnt->KeyValue("maxs", str_nonfunc);
 						}
 					}
 				}
@@ -1402,7 +1421,14 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 				{
 					DYNAMICINT(ClientPrint(UTIL_GetLocalPlayer(), HUD_PRINTCENTER, absstr))
 					{
-						ClientPrint(UTIL_GetLocalPlayer(), HUD_PRINTCENTER, value->GetString());
+						ClientPrint(UTIL_GetLocalPlayer(), HUD_PRINTCENTER, str_nonfunc);
+					}
+				}
+				else if (!Q_strcmp(value->GetName(), "notify"))
+				{
+					DYNAMICINT(ClientPrint(UTIL_GetLocalPlayer(), HUD_PRINTTALK, absstr))
+					{
+						ClientPrint(UTIL_GetLocalPlayer(), HUD_PRINTTALK, str_nonfunc);
 					}
 				}
 			}
@@ -1415,21 +1441,21 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 				{
 					DYNAMICINT(engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), absstr))
 					{
-						engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), value->GetString());
+						engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), str_nonfunc);
 					}
 				}
 				else if (!Q_strcmp(value->GetName(), "message"))
 				{
 					DYNAMICINT(ConMsg("%s\n", absstr))
 					{
-						ConMsg("%s\n", value->GetString());
+						ConMsg("%s\n", str_nonfunc);
 					}
 				}
 				else if (!Q_strcmp(value->GetName(), "DevMsg"))
 				{
 					DYNAMICINT(DevMsg("%s\n", absstr))
 					{
-						DevMsg("%s\n", value->GetString());
+						DevMsg("%s\n", str_nonfunc);
 					}
 				}
 			}
@@ -1440,18 +1466,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 			{
 				DYNAMICINT(engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "ent_fire %s %s", value->GetName(), absstr))
 				{
-					engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "ent_fire %s %s", value->GetName(), value->GetString());
-				}
-			}
-			KeyValues* addoutput = classname->FindKey("addoutput");
-			if (addoutput)
-			{
-				FOR_EACH_VALUE(addoutput, value)
-				{
-					DYNAMICINT(engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "ent_fire %s addoutput \"%s\"", value->GetName(), absstr))
-					{
-						engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "ent_fire %s addoutput \"%s\"", value->GetName(), value->GetString());
-					}
+					engine->ClientCommand(UTIL_GetLocalPlayer()->edict(), "ent_fire %s %s", value->GetName(), str_nonfunc);
 				}
 			}
 		}
@@ -1466,7 +1481,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 					{
 						DYNAMICINT(ent->KeyValue("targetname", absstr))
 						{
-							ent->KeyValue("targetname", value->GetString());
+							ent->KeyValue("targetname", str_nonfunc);
 						}
 					}
 					else if (!Q_strcmp(value->GetName(), "origin"))
@@ -1480,7 +1495,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 						{
 							DYNAMICINT(ent->KeyValue("origin", absstr))
 							{
-								ent->KeyValue("origin", value->GetString());
+								ent->KeyValue("origin", str_nonfunc);
 							}
 						}
 					}
@@ -1488,7 +1503,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 					{
 						DYNAMICINT(ent->KeyValue("angles", absstr))
 						{
-							ent->KeyValue("angles", value->GetString());
+							ent->KeyValue("angles", str_nonfunc);
 						}
 					}
 					else if (!Q_strcmp(value->GetName(), "velocity"))
@@ -1499,7 +1514,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 						)
 						{
 							Vector velocity;
-							UTIL_StringToVector(velocity.Base(), value->GetString());
+							UTIL_StringToVector(velocity.Base(), str_nonfunc);
 
 							ent->SetAbsVelocity(Vector(velocity.x, velocity.y, velocity.z));
 						}
@@ -1512,7 +1527,7 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 					{
 						DYNAMICINT(ent->KeyValue(value->GetName(), absstr))
 						{
-							ent->KeyValue(value->GetName(), value->GetString());
+							ent->KeyValue(value->GetName(), str_nonfunc);
 						}
 					}
 				}
