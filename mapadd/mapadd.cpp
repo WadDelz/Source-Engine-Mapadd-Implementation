@@ -18,7 +18,6 @@ CMapaddSystem *GetMapaddSystem()
 	return &g_mapaddSystem;
 }
 
-//more messages coming soon 
 void CMapaddSystem::LevelInitPostEntity()
 {
 	if (mapadd_disableload.GetBool())
@@ -430,6 +429,27 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 						floatNames.addElement(value->GetName());
 						floatValues.addElement(Q_atof(value->GetString()));
 					}
+					else if (hasTwoWords(value->GetString()) && !IsNumber(getFirstWord(value->GetString()).c_str()) && !IsNumber(getSecondWord(value->GetString()).c_str()))
+					{
+						CBaseEntity* pEnt = gEntList.FindEntityByName(NULL, getFirstWord(value->GetString()).c_str());
+						if (pEnt)
+						{
+							if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_x"))
+							{
+								floatNames.addElement(value->GetName());
+								floatValues.addElement(pEnt->GetAbsOrigin().x);
+							}
+							else
+							{
+								CBaseEntity* pEnt2 = gEntList.FindEntityByName(NULL, getSecondWord(value->GetString()).c_str());
+								if (pEnt2)
+								{
+									floatNames.addElement(value->GetName());
+									floatValues.addElement(pEnt->GetAbsOrigin().DistTo(pEnt2->GetAbsOrigin()));
+								}
+							}
+						}
+					}
 				}
 			}
 			KeyValues* change = classname->FindKey("change_value");
@@ -512,6 +532,112 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 										if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), floatNames[j]))
 										{
 											floatValues[i] /= floatValues[j];
+											break;
+										}
+									}
+								}
+							}
+							else if (hasTwoWords(value->GetString()) && !IsNumber(getFirstWord(value->GetString()).c_str()) && !IsNumber(getSecondWord(value->GetString()).c_str()))
+							{
+								CBaseEntity* pEnt = gEntList.FindEntityByName(NULL, getFirstWord(value->GetString()).c_str());
+								if (pEnt)
+								{
+									if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_x"))
+									{
+										floatValues[i] = pEnt->GetAbsOrigin().x;
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_y"))
+									{
+										floatValues[i] = pEnt->GetAbsOrigin().y;
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_z"))
+									{
+										floatValues[i] = pEnt->GetAbsOrigin().z;
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "origin_length"))
+									{
+										floatValues[i] = pEnt->GetAbsOrigin().Length();
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "angles_x"))
+									{
+										floatValues[i] = pEnt->GetAbsAngles().x;
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "angles_y"))
+									{
+										floatValues[i] = pEnt->GetAbsAngles().y;
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "angles_z"))
+									{
+										floatValues[i] = pEnt->GetAbsAngles().z;
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "angles_length"))
+									{
+										floatValues[i] = pEnt->GetAbsAngles().Length();
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "velocity_x"))
+									{
+										floatValues[i] = pEnt->GetAbsVelocity().x;
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "velocity_y"))
+									{
+										floatValues[i] = pEnt->GetAbsVelocity().y;
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "velocity_z"))
+									{
+										floatValues[i] = pEnt->GetAbsVelocity().z;
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "velocity_length"))
+									{
+										floatValues[i] = pEnt->GetAbsVelocity().Length();
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "delay"))
+									{
+										floatValues[i] = pEnt->GetDelay();
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "Elasticity"))
+									{
+										floatValues[i] = pEnt->GetElasticity();
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "friction"))
+									{
+										floatValues[i] = pEnt->GetFriction();
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "gravity"))
+									{
+										floatValues[i] = pEnt->GetGravity();
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "last_think"))
+									{
+										floatValues[i] = pEnt->GetLastThink();
+										break;
+									}
+									else if (!Q_strcmp(getSecondWord(value->GetString()).c_str(), "next_think"))
+									{
+										floatValues[i] = pEnt->GetNextThink();
+										break;
+									}
+									else
+									{
+										CBaseEntity* pEnt2 = gEntList.FindEntityByName(NULL, getSecondWord(value->GetString()).c_str());
+										if (pEnt2)
+										{
+											floatValues[i] = pEnt->GetAbsOrigin().DistTo(pEnt2->GetAbsOrigin());
 											break;
 										}
 									}
@@ -1431,6 +1557,10 @@ void CMapaddSystem::ParseEntities(KeyValues* keyvalues)
 					{
 						ClientPrint(UTIL_GetLocalPlayer(), HUD_PRINTTALK, str_nonfunc);
 					}
+				}
+				else
+				{
+					UTIL_ShowMessage(value->GetString(), UTIL_GetLocalPlayer());
 				}
 			}
 		}
