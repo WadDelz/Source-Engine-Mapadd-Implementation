@@ -15,9 +15,12 @@
 //key's value
 
 #define DYNAMICINT(DoThis) 	\
+/*this allows for " to be used in strings as ^ */ \
+const char* str_nonfunc = ReplaceWordBrackets(value->GetString(), "^", "\""); \
 DynamicArray<int> intNamVal;\
 DynamicArray<int> floatNamVal;\
-DynamicArray<int> boolNamVal;\
+DynamicArray<int> boolNamVal; \
+DynamicArray<int> stringNamVal; \
 for (int i = 0; i < intNames.getSize(); i++)\
 {\
 	if (HasWord(value->GetString(), intNames[i]))\
@@ -39,7 +42,14 @@ for (int i = 0; i < boolNames.getSize(); i++)\
 		boolNamVal.addElement(i);\
 	}\
 }\
-if (intNamVal.getSize() != 0 || floatNamVal.getSize() != 0 || boolNamVal.getSize() != 0)\
+for (int i = 0; i < stringNames.getSize(); i++)\
+{\
+	if (HasWord(value->GetString(), stringNames[i]))\
+	{\
+		stringNamVal.addElement(i);\
+	}\
+}\
+if (intNamVal.getSize() != 0 || floatNamVal.getSize() != 0 || boolNamVal.getSize() != 0 || stringNamVal.getSize() != 0)\
 {\
 	const char* absstr = value->GetString();\
 	for (int i = 0; i < intNamVal.getSize(); i++)\
@@ -54,11 +64,16 @@ if (intNamVal.getSize() != 0 || floatNamVal.getSize() != 0 || boolNamVal.getSize
 		Q_snprintf(add, sizeof(add), "%f", floatValues[floatNamVal[i]]);\
 		absstr = ReplaceWord(absstr, floatNames[floatNamVal[i]], add);\
 	}\
+	for (int i = 0; i < stringNamVal.getSize(); i++)\
+	{\
+		absstr = ReplaceWord(absstr, stringNames[stringNamVal[i]], stringValues[stringNamVal[i]]); \
+	}\
 	for (int i = 0; i < boolNamVal.getSize(); i++)\
 	{\
 		std::string add = std::to_string(boolValues[boolNamVal[i]]); \
 		absstr = ReplaceWord(absstr, boolNames[boolNamVal[i]], add.c_str());\
 	}\
+	absstr = ReplaceWordBrackets(absstr, "^", "\""); \
 	DoThis;\
 } \
 	else\
@@ -87,4 +102,5 @@ bool StartsWith(const char* word, const char* find);
 bool HasWord(const char* text, const char* word);
 int binaryToInt(int binaryInt);
 const char* ReplaceWord(const char* text, const char* wordToReplace, const char* replacementWord);
+const char* ReplaceWordBrackets(const char* text, const char* wordToReplace, const char* replacementWord);
 //i will add more to this file in the future
