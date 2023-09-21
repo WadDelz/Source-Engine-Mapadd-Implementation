@@ -18,6 +18,7 @@ CMapaddSystem *GetMapaddSystem()
 	return &g_mapaddSystem;
 }
 
+//more messages coming soon 
 void CMapaddSystem::LevelInitPostEntity()
 {
 	if (mapadd_disableload.GetBool())
